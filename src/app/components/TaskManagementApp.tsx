@@ -228,10 +228,18 @@ export default function TaskManagementApp() {
     setIsSearchVisible(!isSearchVisible);
   };
 
-  // Utility functions
-  const getPriorityClass = (priority: Priority) => {
-    return "text-black";
-  };
+ const getPriorityClass = (priority: Priority) => {
+   switch (priority) {
+     case "High":
+       return "text-black";
+     case "Medium":
+       return "text-black";
+     case "Low":
+       return "text-black";
+     default:
+       return "text-black";
+   }
+ };
 
   const getStatusClass = (status: Status) => {
     switch (status) {
