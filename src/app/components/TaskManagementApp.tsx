@@ -3,6 +3,7 @@
 import type React from "react";
 
 import {
+  AlignCenter,
   ChevronDown,
   ChevronUp,
   Edit,
@@ -228,23 +229,23 @@ export default function TaskManagementApp() {
     setIsSearchVisible(!isSearchVisible);
   };
 
- const getPriorityClass = (priority: Priority) => {
-   switch (priority) {
-     case "High":
-       return "text-black";
-     case "Medium":
-       return "text-black";
-     case "Low":
-       return "text-black";
-     default:
-       return "text-black";
-   }
- };
+  const getPriorityClass = (priority: Priority) => {
+    switch (priority) {
+      case "High":
+        return "text-black";
+      case "Medium":
+        return "text-black";
+      case "Low":
+        return "text-black";
+      default:
+        return "text-black";
+    }
+  };
 
   const getStatusClass = (status: Status) => {
     switch (status) {
       case "Completed":
-        return "bg-green-700 text-white";
+        return "bg-[#03A229] text-white";
       case "In Progress":
         return "bg-yellow-400 text-white";
       default:
@@ -304,10 +305,10 @@ export default function TaskManagementApp() {
     };
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-[#000000E0] bg-opacity-20 flex items-center justify-center z-50">
         <div className="bg-white h-fit rounded-lg p-3 w-full max-w-md">
-          <h2 className="text-xl flex justify-between font-bold mb-2">
-            {currentTask ? "Edit Task" : "Add New Task"}
+          <h2 className="text-lg md:text-xl flex justify-between font-bold mb-2">
+            {currentTask ? "Edit Task" : "Add Task"}
             <XIcon
               className="cursor-pointer"
               onClick={() => setIsModalOpen(false)}
@@ -425,13 +426,13 @@ export default function TaskManagementApp() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="w-1/2 p-2 font-medium text-red-800 border-2 border-red-800 cursor-pointer rounded hover:bg-red-800 hover:text-white"
+                className="w-1/2 p-2 text-sm md:text-base  font-medium text-red-800 border-2 border-red-800 cursor-pointer rounded hover:bg-red-800 hover:text-white"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="w-1/2 p-2 font-medium text-white bg-red-800 rounded cursor-pointer hover:bg-red-900"
+                className="w-1/2 p-2 text-sm md:text-base  font-medium text-white bg-red-800 rounded cursor-pointer hover:bg-red-900"
               >
                 {currentTask ? "Update" : "Add"} Task
               </button>
@@ -460,47 +461,49 @@ export default function TaskManagementApp() {
           </div>
 
           {/* Search icon for mobile */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={toggleSearch}
-              className="p-2 rounded-full hover:bg-gray-100"
-            >
-              <Search className="h-5 w-5 text-red-800" />
-            </button>
-          </div>
-        </div>
+          {!isSearchVisible && (
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={toggleSearch}
+                className="p-2 rounded-full hover:bg-gray-100"
+              >
+                <Search className="h-5 w-5 text-red-800" />
+              </button>
+            </div>
+          )}
 
-        {/* Mobile search bar that appears when search icon is clicked */}
-        {isSearchVisible && (
-          <div
-            ref={searchContainerRef}
-            className="md:hidden mb-4 flex items-center border border-red-800 rounded overflow-hidden"
-          >
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 px-4 py-2 outline-none"
-            />
-            <button
-              onClick={() => setIsSearchVisible(false)}
-              className="p-2 text-red-800"
+          {/* Mobile search bar that appears when search icon is clicked */}
+          {isSearchVisible && (
+            <div
+              ref={searchContainerRef}
+              className="md:hidden mb-4 flex items-center border border-red-800 rounded overflow-hidden"
             >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-        )}
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 px-4 py-2 outline-none"
+              />
+              <button
+                onClick={() => setIsSearchVisible(false)}
+                className="p-2 text-red-800"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          )}
+        </div>
 
         <div className="flex items-center justify-between md:flex-row md:items-center gap-4 mb-5">
           <div className="mb-4">
-            <h1 className="text-xl md:text-2xl font-bold">My Tasks</h1>
+            <h1 className="text-xl md:text-2xl font-bold">Tasks</h1>
           </div>
-          <div className="flex  gap-2">
+          <div className="flex  items-center justify-center  gap-2">
             <button
               onClick={handleAddTask}
-              className="bg-red-800 hover:bg-red-900 items-center font-medium flex text-white px-3 py-1 rounded cursor-pointer"
+              className="bg-red-800 hover:bg-red-900 text-xs sm:text-sm md:text-base items-center font-medium flex text-white px-3 py-[5px] rounded cursor-pointer"
             >
               <Plus className="mr-1" />
               Add Task
@@ -509,21 +512,17 @@ export default function TaskManagementApp() {
               onClick={() =>
                 setSortDirection(sortDirection === "asc" ? "desc" : "asc")
               }
-              className="flex items-center gap-1 px-3 py-2 border-red-900 border-2 text-red-800 font-medium rounded hover:bg-red-900 hover:text-white cursor-pointer"
+              className="flex items-center gap-1  border-red-900 border-2 text-red-800 font-medium rounded px-3 py-1  hover:bg-red-900 hover:text-white cursor-pointer"
             >
               <SortAscIcon /> <p className="hidden md:block">Sort</p>
             </button>
             <div className="relative">
               <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center gap-1 px-3 py-2 border-red-900 border-2 text-red-800 font-medium rounded hover:bg-red-900 hover:text-white cursor-pointer"
+                className="flex items-center gap-1 px-3 py-1 border-red-900 border-2 text-red-800 font-medium rounded hover:bg-red-900 hover:text-white cursor-pointer"
               >
-                Filter
-                {isFilterOpen ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
+                <AlignCenter />
+                <p className="hidden md:block">Filter</p>
               </button>
 
               {isFilterOpen && (
@@ -569,44 +568,64 @@ export default function TaskManagementApp() {
 
       <main>
         {/* Mobile View - Card Layout */}
-        <div className="md:hidden border border-red-800  rounded-md">
+        <div className="lg:hidden border border-red-800  rounded-md">
           {displayedTasks.length > 0 ? (
             <div className="grid gap-2">
               {displayedTasks.map((task, index) => (
-                <div key={task.id} className="rounded-lg overflow-hidden">
+                <div
+                  key={task.id}
+                  className="rounded-lg overflow-hidden flex flex-col justify-between items-start"
+                >
                   <div
-                    className="flex justify-between items-center p-3 cursor-pointer"
+                    className="p-3 cursor-pointer w-full"
                     onClick={() => toggleTaskExpand(task.id)}
                   >
-                    <div className="flex gap-4">
-                      <span className="text-red-800 font-medium">
-                        {index + 1}
-                      </span>
-                      <span className="font-medium">{task.title}</span>
+                    {/* Top row: SL No + Index + Chevron */}
+                    <div className="flex justify-between items-center w-full">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[#941B0F] grid grid-cols-[100px_1fr] font-medium">
+                          SL.No
+                        </span>
+                        <span className="font-semibold text-gray-800">
+                          {index + 1}
+                        </span>
+                      </div>
+                      {expandedTasks[task.id] ? (
+                        <ChevronUp size={18} className="text-[#941B0F] " />
+                      ) : (
+                        <ChevronDown size={18} className="text-[#941B0F] " />
+                      )}
                     </div>
-                    {expandedTasks[task.id] ? (
-                      <ChevronUp className="text-red-800" />
-                    ) : (
-                      <ChevronDown className="text-red-800" />
-                    )}
+
+                    {/* Bottom row: Title */}
+                    <div className="mt-2 grid grid-cols-[109px_1fr] w-full">
+                      <span className="text-[#941B0F]  font-medium">Title</span>
+                      <span className="font-semibold text-gray-800">
+                        {task.title}
+                      </span>
+                    </div>
                   </div>
 
                   {expandedTasks[task.id] && (
-                    <div className="p-3 border-t border-red-200">
+                    <div className="p-3 ">
                       <div className="grid gap-2">
                         <div className="grid grid-cols-[100px_1fr] gap-2">
                           <span className="text-red-800 font-medium">
                             Description:
                           </span>
-                          <span>{task.description}</span>
+                          <span className="font-medium">
+                            {task.description}
+                          </span>
                         </div>
                         <div className="grid grid-cols-[100px_1fr] gap-2">
                           <span className="text-red-800 font-medium">
                             Due Date:
                           </span>
-                          <span>{formatDate(task.dueDate)}</span>
+                          <span className="font-medium">
+                            {formatDate(task.dueDate)}
+                          </span>
                         </div>
-                        <div className="grid grid-cols-[100px_1fr] gap-2">
+                        <div className="grid my-2 grid-cols-[100px_1fr] gap-2">
                           <span className="text-red-800 font-medium">
                             Status:
                           </span>
@@ -618,7 +637,7 @@ export default function TaskManagementApp() {
                             {task.status}
                           </span>
                         </div>
-                        <div className="grid grid-cols-[100px_1fr] gap-2">
+                        <div className="flex gap-[3rem] items-center w-1/2 ">
                           <span className="text-red-800 font-medium">
                             Priority:
                           </span>
@@ -630,18 +649,24 @@ export default function TaskManagementApp() {
                                 e.target.value as Priority
                               )
                             }
-                            className={`px-2 py-1 text-xs leading-5 font-semibold rounded border ${getPriorityClass(
+                            className={`px-2 py-1  text-xs leading-5 font-semibold rounded border ${getPriorityClass(
                               task.priority
                             )}`}
                           >
-                            <option value="High">High</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Low">Low</option>
+                            <option className=" text-sm " value="High">
+                              High
+                            </option>
+                            <option className=" text-sm " value="Medium">
+                              Medium
+                            </option>
+                            <option className=" text-sm " value="Low">
+                              Low
+                            </option>
                           </select>
                         </div>
-                        <div className="flex justify-end gap-2 mt-2">
+                        <div className=" flex justify-center mt-2">
                           <button
-                            className="cursor-pointer p-2 bg-gray-100 rounded-full"
+                            className="cursor-pointer p-2 rounded-full"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleEditTask(task);
@@ -654,7 +679,7 @@ export default function TaskManagementApp() {
                               e.stopPropagation();
                               openDeleteModal(task.id);
                             }}
-                            className="cursor-pointer p-2 bg-gray-100 rounded-full"
+                            className="cursor-pointer p-2 rounded-full"
                           >
                             <Trash2 size={16} />
                           </button>
@@ -673,9 +698,9 @@ export default function TaskManagementApp() {
         </div>
 
         {/* Desktop View - Table Layout */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="min-w-full border border-red-800 rounded-xl">
-            <thead className="bg-red-50 border border-red-800">
+        <div className="hidden lg:block overflow-x-auto border border-red-800 rounded-xl">
+          <table className="min-w-full ">
+            <thead className="bg-[#fff9f8] border-b border-red-800">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase tracking-wider">
                   Sl.No.
@@ -708,10 +733,10 @@ export default function TaskManagementApp() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {task.title}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs">
+                    <td className="px-6 py-4 text-sm text-gray-900 font-medium max-w-xs">
                       {task.description}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {formatDate(task.dueDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
