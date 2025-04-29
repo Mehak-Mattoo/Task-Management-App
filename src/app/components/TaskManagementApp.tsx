@@ -599,7 +599,7 @@ export default function TaskManagementApp() {
 
                     {/* Bottom row: Title */}
                     <div className="mt-2 grid grid-cols-[109px_1fr] w-full">
-                      <span className="text-[#941B0F]  font-medium">Title</span>
+                      <span className="text-[#941B0F] font-medium">Title</span>
                       <span className="font-semibold text-gray-800">
                         {task.title}
                       </span>
@@ -609,7 +609,7 @@ export default function TaskManagementApp() {
                   {expandedTasks[task.id] && (
                     <div className="p-3 ">
                       <div className="grid gap-2">
-                        <div className="grid grid-cols-[100px_1fr] gap-2">
+                        <div className="grid grid-cols-[100px_1fr] mb-2 gap-2">
                           <span className="text-red-800 font-medium">
                             Description:
                           </span>
@@ -617,7 +617,7 @@ export default function TaskManagementApp() {
                             {task.description}
                           </span>
                         </div>
-                        <div className="grid grid-cols-[100px_1fr] gap-2">
+                        <div className="grid grid-cols-[100px_1fr] mb-2  gap-2">
                           <span className="text-red-800 font-medium">
                             Due Date:
                           </span>
@@ -637,7 +637,7 @@ export default function TaskManagementApp() {
                             {task.status}
                           </span>
                         </div>
-                        <div className="flex gap-[3rem] items-center w-1/2 ">
+                        <div className="flex gap-[3rem]  mb-2  items-center w-1/2 ">
                           <span className="text-red-800 font-medium">
                             Priority:
                           </span>
@@ -663,26 +663,26 @@ export default function TaskManagementApp() {
                               Low
                             </option>
                           </select>
-                        </div>
-                        <div className=" flex justify-center mt-2">
-                          <button
-                            className="cursor-pointer p-2 rounded-full"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditTask(task);
-                            }}
-                          >
-                            <Edit size={16} />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openDeleteModal(task.id);
-                            }}
-                            className="cursor-pointer p-2 rounded-full"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          <div className="flex justify-center mt-2">
+                            <button
+                              className="cursor-pointer p-2 rounded-full"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditTask(task);
+                              }}
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDeleteModal(task.id);
+                              }}
+                              className="cursor-pointer p-2 rounded-full"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
