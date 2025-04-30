@@ -7,7 +7,19 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import { Task, Priority, Status } from "../types";
+
+// Types
+export type Priority = "High" | "Medium" | "Low";
+export type Status = "In Progress" | "Completed";
+
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  priority: Priority;
+  status: Status;
+}
 
 interface TaskContextType {
   tasks: Task[];
@@ -16,7 +28,8 @@ interface TaskContextType {
   deleteTask: (id: string) => void;
   searchTasks: (query: string) => Task[];
   filterTasks: (priority?: Priority | "All", status?: Status | "All") => Task[];
-  sortTasks: (order: "asc" | "desc") => void;
+  sortTasks: (order: "asc" | "desc") => Task[];
+  updateTaskPriority: (taskId: string, priority: Priority) => void;
 }
 
 // Initial sample tasks (only used if no tasks in localStorage)
@@ -30,7 +43,38 @@ const initialTasks: Task[] = [
     priority: "Medium",
     status: "Completed",
   },
-  // ... other initial tasks
+  {
+    id: "2",
+    title: "Implement search feature",
+    description: "Add search functionality to the dashboard",
+    dueDate: "2025-05-15",
+    priority: "High",
+    status: "In Progress",
+  },
+  {
+    id: "3",
+    title: "Fix navigation bug",
+    description: "Resolve the navigation issue on mobile devices",
+    dueDate: "2025-05-17",
+    priority: "Medium",
+    status: "In Progress",
+  },
+  {
+    id: "4",
+    title: "Update user profile page",
+    description: "Redesign the user profile page with new UI elements",
+    dueDate: "2025-05-18",
+    priority: "Low",
+    status: "Completed",
+  },
+  {
+    id: "5",
+    title: "Optimize database queries",
+    description: "Improve performance of dashboard queries",
+    dueDate: "2025-05-20",
+    priority: "Low",
+    status: "Completed",
+  },
 ];
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -48,7 +92,6 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   // Initialize state from localStorage or use initial tasks
   const [tasks, setTasks] = useState<Task[]>(() => {
-    
     // Check if we're in a browser environment (important for Next.js)
     if (typeof window !== "undefined") {
       const storedTasks = localStorage.getItem("tasks");
@@ -82,7 +125,13 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
-  // Your other functions remain the same
+  // Update just the priority of a task
+  const updateTaskPriority = (taskId: string, priority: Priority) => {
+    setTasks(
+      tasks.map((task) => (task.id === taskId ? { ...task, priority } : task))
+    );
+  };
+
   const searchTasks = (query: string): Task[] => {
     if (!query) return tasks;
     const lowerCaseQuery = query.toLowerCase();
@@ -104,16 +153,15 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
     });
   };
 
-  const sortTasks = (order: "asc" | "desc") => {
-    const sortedTasks = [...tasks].sort((a, b) => {
+  const sortTasks = (order: "asc" | "desc"): Task[] => {
+    return [...tasks].sort((a, b) => {
       const dateA = new Date(a.dueDate).getTime();
       const dateB = new Date(b.dueDate).getTime();
       return order === "asc" ? dateA - dateB : dateB - dateA;
     });
-    setTasks(sortedTasks);
   };
 
-  const value = {
+  const value: TaskContextType = {
     tasks,
     addTask,
     updateTask,
@@ -121,6 +169,7 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
     searchTasks,
     filterTasks,
     sortTasks,
+    updateTaskPriority,
   };
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;

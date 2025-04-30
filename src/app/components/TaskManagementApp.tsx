@@ -15,67 +15,22 @@ import {
   XIcon,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useTaskContext, Task, Priority, Status } from "../context/TaskContext";
 
-// Types
-type Priority = "High" | "Medium" | "Low";
-type Status = "In Progress" | "Completed";
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  dueDate: string;
-  priority: Priority;
-  status: Status;
-}
-
-// Demo Component
+// Main Component
 export default function TaskManagementApp() {
-  // Sample tasks
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: "1",
-      title: "Complete project documentation",
-      description: "Finalize all documentation for the Q2 project release",
-      dueDate: "2025-05-12",
-      priority: "Medium",
-      status: "Completed",
-    },
-    {
-      id: "2",
-      title: "Implement search feature",
-      description: "Add search functionality to the dashboard",
-      dueDate: "2025-05-15",
-      priority: "High",
-      status: "In Progress",
-    },
-    {
-      id: "3",
-      title: "Fix navigation bug",
-      description: "Resolve the navigation issue on mobile devices",
-      dueDate: "2025-05-17",
-      priority: "Medium",
-      status: "In Progress",
-    },
-    {
-      id: "4",
-      title: "Update user profile page",
-      description: "Redesign the user profile page with new UI elements",
-      dueDate: "2025-05-18",
-      priority: "Low",
-      status: "Completed",
-    },
-    {
-      id: "5",
-      title: "Optimize database queries",
-      description: "Improve performance of dashboard queries",
-      dueDate: "2025-05-20",
-      priority: "Low",
-      status: "Completed",
-    },
-  ]);
+  const {
+    tasks,
+    addTask,
+    updateTask,
+    deleteTask,
+    searchTasks,
+    filterTasks,
+    sortTasks,
+    updateTaskPriority,
+  } = useTaskContext();
 
-  // If context is not working, we'll implement our own search and filter functions
+  // Local state for UI
   const [searchQuery, setSearchQuery] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<Priority | "All">("All");
   const [statusFilter, setStatusFilter] = useState<Status | "All">("All");
@@ -125,48 +80,10 @@ export default function TaskManagementApp() {
     }));
   };
 
-  // Implement our own search function
-  const searchTasksLocal = (tasks: Task[], query: string) => {
-    if (!query) return tasks;
-    const lowerCaseQuery = query.toLowerCase();
-    return tasks.filter(
-      (task) =>
-        task.title.toLowerCase().includes(lowerCaseQuery) ||
-        task.description.toLowerCase().includes(lowerCaseQuery)
-    );
-  };
-
-  // Implement our own filter function
-  const filterTasksLocal = (
-    tasks: Task[],
-    priority: Priority | "All",
-    status: Status | "All"
-  ) => {
-    return tasks.filter((task) => {
-      const priorityMatch = priority === "All" || task.priority === priority;
-      const statusMatch = status === "All" || task.status === status;
-      return priorityMatch && statusMatch;
-    });
-  };
-
-  // Sort functionality
-  const sortTasksByDate = (tasks: Task[], direction: "asc" | "desc") => {
-    return [...tasks].sort((a, b) => {
-      const dateA = new Date(a.dueDate).getTime();
-      const dateB = new Date(b.dueDate).getTime();
-      return direction === "asc" ? dateA - dateB : dateB - dateA;
-    });
-  };
-
   // Process tasks with current filters and search
-  // Use local implementations if context functions aren't working
-  let displayedTasks = searchTasksLocal(tasks, searchQuery);
-  displayedTasks = filterTasksLocal(
-    displayedTasks,
-    priorityFilter,
-    statusFilter
-  );
-  displayedTasks = sortTasksByDate(displayedTasks, sortDirection);
+  let displayedTasks = searchTasks(searchQuery);
+  displayedTasks = filterTasks(priorityFilter, statusFilter);
+  displayedTasks = sortTasks(sortDirection);
 
   const openDeleteModal = (taskId: string) => {
     setTaskToDelete(taskId);
@@ -180,8 +97,7 @@ export default function TaskManagementApp() {
 
   const confirmDeleteTask = () => {
     if (taskToDelete) {
-      // Use local implementation if context isn't working
-      setTasks(tasks.filter((task) => task.id !== taskToDelete));
+      deleteTask(taskToDelete);
       closeDeleteModal();
     }
   };
@@ -200,28 +116,16 @@ export default function TaskManagementApp() {
   const handleTaskSubmit = (taskData: Omit<Task, "id">) => {
     if (currentTask) {
       // Update task
-      setTasks(
-        tasks.map((task) =>
-          task.id === currentTask.id
-            ? { ...taskData, id: currentTask.id }
-            : task
-        )
-      );
+      updateTask({ ...taskData, id: currentTask.id });
     } else {
       // Add task
-      const newTask = {
-        ...taskData,
-        id: Math.random().toString(36).substr(2, 9),
-      };
-      setTasks([...tasks, newTask]);
+      addTask(taskData);
     }
     setIsModalOpen(false);
   };
 
   const handlePriorityChange = (task: Task, newPriority: Priority) => {
-    setTasks(
-      tasks.map((t) => (t.id === task.id ? { ...t, priority: newPriority } : t))
-    );
+    updateTaskPriority(task.id, newPriority);
   };
 
   // Toggle search visibility
@@ -496,8 +400,8 @@ export default function TaskManagementApp() {
           )}
         </div>
 
-        <div className="flex items-center justify-between md:flex-row md:items-center gap-4 mb-5">
-          <div className="mb-4">
+        <div className="flex  items-center justify-between flex-col sm:flex-row  gap-4 mb-5">
+          <div className="">
             <h1 className="text-xl md:text-2xl font-bold">Tasks</h1>
           </div>
           <div className="flex  items-center justify-center  gap-2">
@@ -505,7 +409,7 @@ export default function TaskManagementApp() {
               onClick={handleAddTask}
               className="bg-red-800 hover:bg-red-900 text-xs sm:text-sm md:text-base items-center font-medium flex text-white px-3 py-[5px] rounded cursor-pointer"
             >
-              <Plus className="mr-1" />
+              <Plus className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 mr-1" />
               Add Task
             </button>
             <button
@@ -514,14 +418,15 @@ export default function TaskManagementApp() {
               }
               className="flex items-center gap-1  border-red-900 border-2 text-red-800 font-medium rounded px-3 py-1  hover:bg-red-900 hover:text-white cursor-pointer"
             >
-              <SortAscIcon /> <p className="hidden md:block">Sort</p>
+              <SortAscIcon className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
+              <p className="hidden md:block">Sort</p>
             </button>
             <div className="relative">
               <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
                 className="flex items-center gap-1 px-3 py-1 border-red-900 border-2 text-red-800 font-medium rounded hover:bg-red-900 hover:text-white cursor-pointer"
               >
-                <AlignCenter />
+                <AlignCenter className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 <p className="hidden md:block">Filter</p>
               </button>
 
@@ -582,7 +487,7 @@ export default function TaskManagementApp() {
                   >
                     {/* Top row: SL No + Index + Chevron */}
                     <div className="flex justify-between items-center w-full">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center text-sm gap-2">
                         <span className="text-[#941B0F] grid grid-cols-[100px_1fr] font-medium">
                           SL.No
                         </span>
@@ -598,7 +503,7 @@ export default function TaskManagementApp() {
                     </div>
 
                     {/* Bottom row: Title */}
-                    <div className="mt-2 grid grid-cols-[109px_1fr] w-full">
+                    <div className="mt-2 text-sm  grid grid-cols-[109px_1fr] w-full">
                       <span className="text-[#941B0F] font-medium">Title</span>
                       <span className="font-semibold text-gray-800">
                         {task.title}
@@ -609,7 +514,7 @@ export default function TaskManagementApp() {
                   {expandedTasks[task.id] && (
                     <div className="p-3 ">
                       <div className="grid gap-2">
-                        <div className="grid grid-cols-[100px_1fr] mb-2 gap-2">
+                        <div className="grid  text-sm  grid-cols-[100px_1fr] mb-2 gap-2">
                           <span className="text-red-800 font-medium">
                             Description:
                           </span>
@@ -617,7 +522,7 @@ export default function TaskManagementApp() {
                             {task.description}
                           </span>
                         </div>
-                        <div className="grid grid-cols-[100px_1fr] mb-2  gap-2">
+                        <div className="grid  text-sm  grid-cols-[100px_1fr] mb-2  gap-2">
                           <span className="text-red-800 font-medium">
                             Due Date:
                           </span>
@@ -625,7 +530,7 @@ export default function TaskManagementApp() {
                             {formatDate(task.dueDate)}
                           </span>
                         </div>
-                        <div className="grid my-2 grid-cols-[100px_1fr] gap-2">
+                        <div className="grid  text-sm  my-2 grid-cols-[100px_1fr] gap-2">
                           <span className="text-red-800 font-medium">
                             Status:
                           </span>
@@ -637,35 +542,40 @@ export default function TaskManagementApp() {
                             {task.status}
                           </span>
                         </div>
-                        <div className="flex gap-[3rem]  mb-2  items-center w-1/2 ">
-                          <span className="text-red-800 font-medium">
-                            Priority:
-                          </span>
-                          <select
-                            value={task.priority}
-                            onChange={(e) =>
-                              handlePriorityChange(
-                                task,
-                                e.target.value as Priority
-                              )
-                            }
-                            className={`px-2 py-1  text-xs leading-5 font-semibold rounded border ${getPriorityClass(
-                              task.priority
-                            )}`}
-                          >
-                            <option className=" text-sm " value="High">
-                              High
-                            </option>
-                            <option className=" text-sm " value="Medium">
-                              Medium
-                            </option>
-                            <option className=" text-sm " value="Low">
-                              Low
-                            </option>
-                          </select>
-                          <div className="flex justify-center mt-2">
+                        <div className="flex flex-col sm:flex-row items-start justify-between w-full gap-3  rounded">
+                          {/* Priority Label + Select */}
+                          <div className="flex  text-sm  items-center gap-2">
+                            <span className="text-red-800 font-medium">
+                              Priority:
+                            </span>
+                            <select
+                              value={task.priority}
+                              onChange={(e) =>
+                                handlePriorityChange(
+                                  task,
+                                  e.target.value as Priority
+                                )
+                              }
+                              className={`px-2 py-1 ml-13 text-xs leading-5 font-semibold rounded border ${getPriorityClass(
+                                task.priority
+                              )}`}
+                            >
+                              <option className="text-sm" value="High">
+                                High
+                              </option>
+                              <option className="text-sm" value="Medium">
+                                Medium
+                              </option>
+                              <option className="text-sm" value="Low">
+                                Low
+                              </option>
+                            </select>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex sm:ml-20 gap-2">
                             <button
-                              className="cursor-pointer p-2 rounded-full"
+                              className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleEditTask(task);
@@ -678,7 +588,7 @@ export default function TaskManagementApp() {
                                 e.stopPropagation();
                                 openDeleteModal(task.id);
                               }}
-                              className="cursor-pointer p-2 rounded-full"
+                              className="cursor-pointer p-2  rounded-full hover:bg-gray-200"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -765,14 +675,14 @@ export default function TaskManagementApp() {
                     </td>
                     <td className="px-6 py-4 space-x-2 whitespace-nowrap">
                       <button
-                        className="cursor-pointer"
+                        className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
                         onClick={() => handleEditTask(task)}
                       >
                         <Edit size={16} />
                       </button>
                       <button
                         onClick={() => openDeleteModal(task.id)}
-                        className="cursor-pointer"
+                        className="cursor-pointer p-2 rounded-full hover:bg-gray-200"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -795,7 +705,7 @@ export default function TaskManagementApp() {
       </main>
 
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
+        <div className="fixed inset-0  bg-[#000000E0] bg-opacity-20 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-sm">
             <h2 className="text-lg font-bold mb-4">Confirm Deletion</h2>
             <p className="mb-6 text-gray-600">
