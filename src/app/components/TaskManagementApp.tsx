@@ -20,7 +20,7 @@ import { useTaskContext, Task, Priority, Status } from "../context/TaskContext";
 // Main Component
 export default function TaskManagementApp() {
   const {
-    tasks,
+  
     addTask,
     updateTask,
     deleteTask,
